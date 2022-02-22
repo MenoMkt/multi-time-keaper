@@ -15,6 +15,7 @@ import {
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import ReplayIcon from "@mui/icons-material/Replay";
+import dayjs from "dayjs";
 
 type Props = {
   title: string;
@@ -23,11 +24,42 @@ type Props = {
 const TimerCard = (props: Props) => {
   const [time, setTime] = useState(new Date());
   const [title, setTitle] = useState(props.title);
-
+  const [running, setRunning] = useState(false);
+  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
   useEffect(() => {
     console.log(time);
     console.log(typeof time);
   }, [time]);
+  const clearTimer = () => {
+    setTimeoutId(null);
+    setRunning(false);
+  };
+  const onChangeStartPauseButton = () => {
+    console.log("onChangeStartPauseButton");
+    if (running) {
+      if (timeoutId) clearTimeout(timeoutId);
+      setTimeoutId(null);
+      console.log("pause timer");
+      setRunning(false);
+    } else {
+      // タイマー有効化
+      const remainMs = dayjs()
+        .set("hour", time.getHours())
+        .set("minute", time.getMinutes())
+        .diff();
+      console.log(
+        dayjs().set("hour", time.getHours()).set("minute", time.getMinutes())
+      );
+      console.log(remainMs);
+      setTimeoutId(
+        setTimeout(() => {
+          clearTimer();
+          window.alert(`${title} Alert !!!`);
+        }, remainMs)
+      );
+      setRunning(true);
+    }
+  };
   return (
     <div className="TimerCard">
       <Card sx={{ display: "flex" }}>
@@ -53,9 +85,11 @@ const TimerCard = (props: Props) => {
             </CardContent>
 
             <Box sx={{ display: "flex", alignItems: "center", pl: 1, pb: 1 }}>
-              <IconButton aria-label="play/pause">
-                <PlayArrowIcon />
-                <PauseIcon />
+              <IconButton
+                aria-label="play/pause"
+                onClick={onChangeStartPauseButton}
+              >
+                {running ? <PauseIcon /> : <PlayArrowIcon />}
               </IconButton>
               <IconButton aria-label="reset">
                 <ReplayIcon />
