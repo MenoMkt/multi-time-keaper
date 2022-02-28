@@ -34,6 +34,17 @@ const TimerCard = (props: Props) => {
     setTimeoutId(null);
     setRunning(false);
   };
+  /**
+   * Notification APIで通知する
+   */
+  const alert = () => {
+    const n = new Notification(`${title} alert!`, {
+      tag: title + Date.now().toString(),
+    });
+    n.onclick = () => {
+      n.close();
+    };
+  };
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
     if (running) {
@@ -54,7 +65,7 @@ const TimerCard = (props: Props) => {
       setTimeoutId(
         setTimeout(() => {
           clearTimer();
-          window.alert(`${title} Alert !!!`);
+          alert();
         }, remainMs)
       );
       setRunning(true);
@@ -80,7 +91,7 @@ const TimerCard = (props: Props) => {
           >
             <CardContent sx={{ flex: "1 0 auto" }}>
               <Typography component="div" variant="h5">
-                Title
+                {title}
               </Typography>
             </CardContent>
 
