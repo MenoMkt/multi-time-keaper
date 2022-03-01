@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PropTypes from "prop-types";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -15,6 +15,8 @@ import {
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import ReplayIcon from "@mui/icons-material/Replay";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
 
 type Props = {
@@ -24,12 +26,11 @@ type Props = {
 const TimerCard = (props: Props) => {
   const [time, setTime] = useState(new Date());
   const [title, setTitle] = useState(props.title);
+  const tmpTitle = useRef("");
+  const [titleEditMode, setTitleEditMode] = useState(false);
   const [running, setRunning] = useState(false);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
-  useEffect(() => {
-    console.log(time);
-    console.log(typeof time);
-  }, [time]);
+
   const clearTimer = () => {
     setTimeoutId(null);
     setRunning(false);
@@ -44,6 +45,20 @@ const TimerCard = (props: Props) => {
     n.onclick = () => {
       n.close();
     };
+  };
+  const onChangeTitleEditMode = () => {
+    console.log("onChangeTitleEditMode");
+    if (titleEditMode) {
+      setTitleEditMode(false);
+      setTitle(tmpTitle.current);
+    } else {
+      setTitleEditMode(true);
+      tmpTitle.current = title;
+    }
+    console.log({
+      title,
+      tmp: tmpTitle.current,
+    });
   };
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
@@ -90,9 +105,29 @@ const TimerCard = (props: Props) => {
             }}
           >
             <CardContent sx={{ flex: "1 0 auto" }}>
-              <Typography component="div" variant="h5">
+              <TextField
+                id="title "
+                label="title"
+                defaultValue={title}
+                inputRef={tmpTitle}
+                onChange={(v) => {
+                  tmpTitle.current = v.target.value;
+                }}
+                style={!titleEditMode ? { display: "none" } : {}}
+              />
+              <Typography
+                component="div"
+                variant="h5"
+                style={titleEditMode ? { display: "none" } : {}}
+              >
                 {title}
               </Typography>
+              <IconButton
+                aria-label="edit-title"
+                onClick={onChangeTitleEditMode}
+              >
+                {titleEditMode ? <CheckCircleIcon /> : <EditIcon />}
+              </IconButton>
             </CardContent>
 
             <Box sx={{ display: "flex", alignItems: "center", pl: 1, pb: 1 }}>
