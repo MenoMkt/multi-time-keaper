@@ -88,23 +88,29 @@ const TimerCard = (props: Props) => {
   };
   return (
     <div className="TimerCard">
-      <Card sx={{ display: "flex" }}>
-        <Box
+      <Card
+        sx={{
+          width: "500px",
+        }}
+      >
+        <CardContent
           sx={{
+            alignItems: "flex-start",
             display: "flex",
-            flexDirection: "row",
-            alignItems: "baseline",
           }}
         >
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
-              pl: 1,
-              pb: 1,
             }}
           >
-            <CardContent sx={{ flex: "1 0 auto" }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+              }}
+            >
               <TextField
                 id="title "
                 label="title"
@@ -113,11 +119,24 @@ const TimerCard = (props: Props) => {
                 onChange={(v) => {
                   tmpTitle.current = v.target.value;
                 }}
+                sx={{
+                  width: "200px",
+                }}
                 style={!titleEditMode ? { display: "none" } : {}}
               />
               <Typography
                 component="div"
                 variant="h5"
+                textAlign={"left"}
+                sx={{
+                  pl: 1,
+                  pt: 2,
+                  pb: 1,
+                  width: "200px",
+                  boxSizing: "border-box",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
                 style={titleEditMode ? { display: "none" } : {}}
               >
                 {title}
@@ -125,12 +144,16 @@ const TimerCard = (props: Props) => {
               <IconButton
                 aria-label="edit-title"
                 onClick={onChangeTitleEditMode}
+                sx={{
+                  mt: 1,
+                  mb: 1,
+                }}
               >
                 {titleEditMode ? <CheckCircleIcon /> : <EditIcon />}
               </IconButton>
-            </CardContent>
-
-            <Box sx={{ display: "flex", alignItems: "center", pl: 1, pb: 1 }}>
+            </Box>
+            {/* タイマーコントロール */}
+            <Box sx={{ display: "flex", alignItems: "center" }}>
               <IconButton
                 aria-label="play/pause"
                 onClick={onChangeStartPauseButton}
@@ -142,7 +165,8 @@ const TimerCard = (props: Props) => {
               </IconButton>
             </Box>
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", pl: 1, pb: 1 }}>
+          {/* 右側の要素 */}
+          <Box sx={{ display: "flex", alignItems: "baseline" }}>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <TimePicker
                 label="Basic example"
@@ -157,9 +181,7 @@ const TimerCard = (props: Props) => {
               />
             </LocalizationProvider>
           </Box>
-        </Box>
-
-        {/*  */}
+        </CardContent>
       </Card>
     </div>
   );
