@@ -18,7 +18,11 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import dayjs from "dayjs";
-
+import Countdown, {
+  CountdownRenderProps,
+  CountdownApi,
+  zeroPad,
+} from "react-countdown";
 type Props = {
   title: string;
 };
@@ -28,17 +32,49 @@ const TimerCard = (props: Props) => {
   const [title, setTitle] = useState(props.title);
   const tmpTitle = useRef("");
   const [titleEditMode, setTitleEditMode] = useState(false);
+  const [countdownDate, setCountdownDate] = useState(Date.now());
   const [running, setRunning] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
 
-  const clearTimer = () => {
-    setTimeoutId(null);
+  let countdownApi: CountdownApi | undefined = undefined;
+  // Renderer callback with condition
+  const countdownRender = ({
+    hours,
+    minutes,
+    seconds,
+    completed,
+  }: CountdownRenderProps) => {
+    return (
+      <Typography component="div" variant="h5" textAlign={"right"}>
+        {zeroPad(hours)}:{zeroPad(minutes)}:{zeroPad(seconds)}
+      </Typography>
+    );
+  };
+
+  const startTimer = () => {
+    const timeDate = dayjs()
+      .set("hour", time.getHours())
+      .set("minute", time.getMinutes())
+      .set("second", time.getSeconds());
+    setCountdownDate(timeDate.valueOf());
+    countdownApi?.start();
+    setRunning(true);
+  };
+  const pauseTimer = () => {
+    console.log("pause timer");
+    setRunning(false);
+    countdownApi?.pause();
+    // setCountdownDate(Date.now());
+  };
+  const completeTimer = () => {
+    console.log("on complete timer");
+    timerAlert();
     setRunning(false);
   };
+
   /**
    * Notification APIで通知する
    */
-  const alert = () => {
+  const timerAlert = () => {
     const n = new Notification(`${title} alert!`, {
       tag: title + Date.now().toString(),
     });
@@ -49,10 +85,10 @@ const TimerCard = (props: Props) => {
   const onChangeTitleEditMode = () => {
     console.log("onChangeTitleEditMode");
     if (titleEditMode) {
-      setTitleEditMode(false);
+      setTitleEditMode((flg) => !flg);
       setTitle(tmpTitle.current);
     } else {
-      setTitleEditMode(true);
+      setTitleEditMode((flg) => !flg);
       tmpTitle.current = title;
     }
     console.log({
@@ -63,29 +99,13 @@ const TimerCard = (props: Props) => {
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
     if (running) {
-      if (timeoutId) clearTimeout(timeoutId);
-      setTimeoutId(null);
-      console.log("pause timer");
-      setRunning(false);
+      pauseTimer();
     } else {
       // タイマー有効化
-      const remainMs = dayjs()
-        .set("hour", time.getHours())
-        .set("minute", time.getMinutes())
-        .diff();
-      console.log(
-        dayjs().set("hour", time.getHours()).set("minute", time.getMinutes())
-      );
-      console.log(remainMs);
-      setTimeoutId(
-        setTimeout(() => {
-          clearTimer();
-          alert();
-        }, remainMs)
-      );
-      setRunning(true);
+      startTimer();
     }
   };
+
   return (
     <div className="TimerCard">
       <Card
@@ -166,7 +186,13 @@ const TimerCard = (props: Props) => {
             </Box>
           </Box>
           {/* 右側の要素 */}
-          <Box sx={{ display: "flex", alignItems: "baseline" }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "baseline",
+              flexDirection: "column",
+            }}
+          >
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <TimePicker
                 label="Basic example"
@@ -180,6 +206,19 @@ const TimerCard = (props: Props) => {
                 renderInput={(params) => <TextField {...params} />}
               />
             </LocalizationProvider>
+            <Box sx={{ width: 1 }}>
+              <Countdown
+                date={countdownDate}
+                renderer={countdownRender}
+                ref={(ref) => {
+                  countdownApi = ref?.getApi();
+                }}
+                onComplete={completeTimer}
+                overtime={true}
+                autoStart={false}
+                zeroPadTime={3}
+              />
+            </Box>
           </Box>
         </CardContent>
       </Card>
