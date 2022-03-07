@@ -10,7 +10,7 @@ type Props = {
 };
 const Header = (props: Props) => {
   return (
-    <AppBar position="static" sx={{ mb: 1 }}>
+    <AppBar position="sticky" sx={{ mb: 1 }}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           MultiTimeKeeper
