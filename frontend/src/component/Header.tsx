@@ -5,7 +5,10 @@ import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "@mui/material/Tooltip";
 
-const Header = () => {
+type Props = {
+  onAddTimer?: () => void;
+};
+const Header = (props: Props) => {
   return (
     <AppBar position="static" sx={{ mb: 1 }}>
       <Toolbar>
@@ -19,6 +22,7 @@ const Header = () => {
             color="inherit"
             aria-label="menu"
             sx={{ mr: 2 }}
+            onClick={props.onAddTimer}
           >
             <AddIcon fontSize="large"></AddIcon>
           </IconButton>

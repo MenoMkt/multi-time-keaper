@@ -21,9 +21,9 @@ import {
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import ReplayIcon from "@mui/icons-material/Replay";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
 import Countdown, {
   CountdownRenderProps,
@@ -32,6 +32,7 @@ import Countdown, {
 } from "react-countdown";
 type Props = {
   title: string;
+  onDelete?: () => void;
 };
 type Progress = {
   value: number;
@@ -213,8 +214,8 @@ const TimerCard = (props: Props) => {
                 >
                   {running ? <PauseIcon /> : <PlayArrowIcon />}
                 </IconButton>
-                <IconButton aria-label="reset">
-                  <ReplayIcon />
+                <IconButton aria-label="reset" onClick={props.onDelete}>
+                  <DeleteIcon />
                 </IconButton>
               </Box>
             </Box>
