@@ -17,6 +17,8 @@ import {
   TextField,
   Typography,
   LinearProgress,
+  Alert,
+  Collapse,
 } from "@mui/material";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -41,12 +43,13 @@ type Progress = {
 };
 
 const TimerCard = (props: Props) => {
-  const [time, setTime] = useState(new Date());
+  const [time, setTime] = useState(dayjs().add(1, "h").toDate());
   const [title, setTitle] = useState(props.title);
   const tmpTitle = useRef("");
-  const [titleEditMode, setTitleEditMode] = useState(false);
+  const [isTitleEditMode, setTitleEditMode] = useState(false);
+  const [canStartTimer, setCanStartTimer] = useState(true);
   const [countdownDate, setCountdownDate] = useState(Date.now());
-  const [running, setRunning] = useState(false);
+  const [isRunning, setRunning] = useState(false);
   const [progress, setProgress] = useState<Progress>({
     value: 0,
     startDate: Date.now(),
@@ -117,7 +120,7 @@ const TimerCard = (props: Props) => {
   };
   const onChangeTitleEditMode = () => {
     console.log("onChangeTitleEditMode");
-    if (titleEditMode) {
+    if (isTitleEditMode) {
       setTitleEditMode((flg) => !flg);
       setTitle(tmpTitle.current);
     } else {
@@ -131,7 +134,7 @@ const TimerCard = (props: Props) => {
   };
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
-    if (running) {
+    if (isRunning) {
       pauseTimer();
     } else {
       // タイマー有効化
@@ -176,7 +179,7 @@ const TimerCard = (props: Props) => {
                   sx={{
                     width: "200px",
                   }}
-                  style={!titleEditMode ? { display: "none" } : {}}
+                  style={!isTitleEditMode ? { display: "none" } : {}}
                 />
                 <Typography
                   component="div"
@@ -191,7 +194,7 @@ const TimerCard = (props: Props) => {
                     overflow: "hidden",
                     textOverflow: "ellipsis",
                   }}
-                  style={titleEditMode ? { display: "none" } : {}}
+                  style={isTitleEditMode ? { display: "none" } : {}}
                 >
                   {title}
                 </Typography>
@@ -202,8 +205,9 @@ const TimerCard = (props: Props) => {
                     mt: 1,
                     mb: 1,
                   }}
+                  disabled={isRunning}
                 >
-                  {titleEditMode ? <CheckCircleIcon /> : <EditIcon />}
+                  {isTitleEditMode ? <CheckCircleIcon /> : <EditIcon />}
                 </IconButton>
               </Box>
               {/* タイマーコントロール */}
@@ -211,8 +215,9 @@ const TimerCard = (props: Props) => {
                 <IconButton
                   aria-label="play/pause"
                   onClick={onChangeStartPauseButton}
+                  disabled={isTitleEditMode || !canStartTimer}
                 >
-                  {running ? <PauseIcon /> : <PlayArrowIcon />}
+                  {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
                 </IconButton>
                 <IconButton aria-label="reset" onClick={props.onDelete}>
                   <DeleteIcon />
@@ -229,16 +234,22 @@ const TimerCard = (props: Props) => {
             >
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <TimePicker
-                  label="Basic example"
                   ampm={false}
                   value={time}
                   onChange={(newValue) => {
                     if (newValue) {
                       setTime(newValue);
+                      setCanStartTimer(dayjs().isBefore(newValue));
                     }
                   }}
+                  readOnly={isRunning}
                   renderInput={(params) => <TextField {...params} />}
                 />
+                <Collapse in={!canStartTimer}>
+                  <Alert severity="warning">
+                    現在時刻より先の時間に設定してください。
+                  </Alert>
+                </Collapse>
               </LocalizationProvider>
               <Box sx={{ width: 1 }}>
                 <Countdown
