@@ -1,15 +1,9 @@
 import { useEffect } from "react";
+import { Timer } from "../store/timer";
 
 export type AppContext = {
   themeMode: "light" | "dark" | undefined;
   timers: Timer[];
-};
-
-export type Timer = {
-  id: string;
-  title: string;
-  hour: number;
-  minute: number;
 };
 
 export const useBackupApp = (
