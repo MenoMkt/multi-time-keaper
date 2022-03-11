@@ -6,15 +6,20 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TimerCard from "./component/Card";
 import Header from "./component/Header";
 import { ulid } from "ulid";
-
-type TimerCardContext = {
-  id: string;
-  title: string;
-};
+import dayjs from "dayjs";
+import { useBackupApp, Timer } from "./feature/appStorage";
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: (mode?: "dark" | "light") => {},
 });
+
+const getInitTime = (date?: Date) => {
+  const d = date ? dayjs(date) : dayjs().add(1, "h");
+  return {
+    hour: d.get("h"),
+    minute: d.get("minute"),
+  };
+};
 
 function App() {
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -41,12 +46,15 @@ function App() {
     [colorMode]
   );
 
-  const [timerList, setTimerList] = useState<TimerCardContext[]>([
+  const [timerList, setTimerList] = useState<Timer[]>([
     {
       id: ulid(),
       title: "timer1",
+      ...getInitTime(),
     },
   ]);
+
+  useBackupApp(colorMode, timerList);
   useEffect(() => {
     // Notification API 初期化
     if (!Notification) {
@@ -67,6 +75,7 @@ function App() {
         {
           id: ulid(),
           title: `timer${list.length + 1}`,
+          ...getInitTime(),
         },
       ];
     });
