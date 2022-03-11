@@ -1,10 +1,4 @@
-import React, {
-  ProfilerOnRenderCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -32,7 +26,12 @@ import Countdown, {
   CountdownApi,
   zeroPad,
 } from "react-countdown";
+
+import { useDispatch } from "react-redux";
+import { updateTimer, updateTitle } from "../store/timer";
+
 type Props = {
+  id: string;
   title: string;
   onDelete?: () => void;
 };
@@ -55,6 +54,8 @@ const TimerCard = (props: Props) => {
     startDate: Date.now(),
     endDate: Date.now(),
   });
+
+  const dispatch = useDispatch();
 
   let countdownApi: CountdownApi | undefined = undefined;
   // Renderer callback with condition
@@ -123,6 +124,7 @@ const TimerCard = (props: Props) => {
     if (isTitleEditMode) {
       setTitleEditMode((flg) => !flg);
       setTitle(tmpTitle.current);
+      dispatch(updateTitle({ id: props.id, title: tmpTitle.current }));
     } else {
       setTitleEditMode((flg) => !flg);
       tmpTitle.current = title;
@@ -240,6 +242,9 @@ const TimerCard = (props: Props) => {
                     if (newValue) {
                       setTime(newValue);
                       setCanStartTimer(dayjs().isBefore(newValue));
+                      dispatch(
+                        updateTimer({ id: props.id, date: newValue.valueOf() })
+                      );
                     }
                   }}
                   readOnly={isRunning}
