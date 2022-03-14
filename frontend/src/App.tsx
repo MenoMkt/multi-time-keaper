@@ -5,9 +5,9 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TimerCard from "./component/Card";
 import Header from "./component/Header";
-import { useBackupApp } from "./feature/appStorage";
+import { getAppContext, useBackupApp } from "./feature/appStorage";
 import { useSelector, useDispatch } from "react-redux";
-import { addNewTimer, removeTimer } from "./store/timer";
+import { addNewTimer, removeTimer, initTimerList } from "./store/timer";
 import { RootState } from "./store";
 
 type ThemeMode = "light" | "dark";
@@ -55,7 +55,12 @@ function App() {
     }
 
     // タイマーリストが0の場合初期化
-    dispatch(addNewTimer());
+    const appContext = getAppContext();
+    if (appContext && appContext.timer && appContext.timer.length) {
+      dispatch(initTimerList(appContext.timer));
+    } else {
+      dispatch(addNewTimer());
+    }
   }, []);
 
   return (

@@ -22,6 +22,10 @@ export const timerSlice = createSlice({
   name: "timer",
   initialState,
   reducers: {
+    initTimerList: (state, action: PayloadAction<TimerState>) => {
+      state.timers = action.payload.timers;
+      state.length = action.payload.length;
+    },
     addNewTimer: (state) => {
       console.log("addNewTimer");
       const id = ulid();
@@ -71,7 +75,13 @@ export const timerSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { addNewTimer, addTimer, removeTimer, updateTimer, updateTitle } =
-  timerSlice.actions;
+export const {
+  addNewTimer,
+  addTimer,
+  removeTimer,
+  updateTimer,
+  updateTitle,
+  initTimerList,
+} = timerSlice.actions;
 
 export default timerSlice.reducer;

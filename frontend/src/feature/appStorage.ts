@@ -6,15 +6,20 @@ export type AppContext = {
   // themeMode: "light" | "dark" | undefined;
   timer: TimerState;
 };
+const LOCAL_STORAGE_CONTEXT_KEY = "context";
 
+export const getAppContext = (): Partial<AppContext> | null => {
+  const value = localStorage.getItem(LOCAL_STORAGE_CONTEXT_KEY);
+  return value ? (JSON.parse(value) as Partial<AppContext>) : null;
+};
 export const useBackupApp = () => {
   const timerState = useSelector((state: RootState) => state.timer);
   const handler = () => {
     console.log("backup App Data");
     localStorage.setItem(
-      "context",
+      LOCAL_STORAGE_CONTEXT_KEY,
       JSON.stringify({
-        timers: timerState,
+        timer: timerState,
       })
     );
   };
