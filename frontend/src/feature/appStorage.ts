@@ -1,28 +1,25 @@
 import { useEffect } from "react";
-
+import { Timer, TimerState } from "../store/timer";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "../store";
 export type AppContext = {
-  themeMode: "light" | "dark" | undefined;
-  timers: Timer[];
+  // themeMode: "light" | "dark" | undefined;
+  timer: TimerState;
 };
+const LOCAL_STORAGE_CONTEXT_KEY = "context";
 
-export type Timer = {
-  id: string;
-  title: string;
-  hour: number;
-  minute: number;
+export const getAppContext = (): Partial<AppContext> | null => {
+  const value = localStorage.getItem(LOCAL_STORAGE_CONTEXT_KEY);
+  return value ? (JSON.parse(value) as Partial<AppContext>) : null;
 };
-
-export const useBackupApp = (
-  colorMode: "light" | "dark",
-  timerList: Timer[]
-) => {
+export const useBackupApp = () => {
+  const timerState = useSelector((state: RootState) => state.timer);
   const handler = () => {
     console.log("backup App Data");
     localStorage.setItem(
-      "context",
+      LOCAL_STORAGE_CONTEXT_KEY,
       JSON.stringify({
-        themeMode: colorMode,
-        timers: timerList,
+        timer: timerState,
       })
     );
   };

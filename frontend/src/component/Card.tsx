@@ -1,10 +1,4 @@
-import React, {
-  ProfilerOnRenderCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { useRef, useState } from "react";
 import PropTypes from "prop-types";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
@@ -32,7 +26,13 @@ import Countdown, {
   CountdownApi,
   zeroPad,
 } from "react-countdown";
+
+import { useDispatch, useSelector } from "react-redux";
+import { Timer, updateTimer, updateTitle } from "../store/timer";
+import { RootState } from "../store";
+
 type Props = {
+  id: string;
   title: string;
   onDelete?: () => void;
 };
@@ -43,8 +43,6 @@ type Progress = {
 };
 
 const TimerCard = (props: Props) => {
-  const [time, setTime] = useState(dayjs().add(1, "h").toDate());
-  const [title, setTitle] = useState(props.title);
   const tmpTitle = useRef("");
   const [isTitleEditMode, setTitleEditMode] = useState(false);
   const [canStartTimer, setCanStartTimer] = useState(true);
@@ -55,6 +53,10 @@ const TimerCard = (props: Props) => {
     startDate: Date.now(),
     endDate: Date.now(),
   });
+  const timer: Timer = useSelector(
+    (state: RootState) => state.timer.timers[props.id]
+  );
+  const dispatch = useDispatch();
 
   let countdownApi: CountdownApi | undefined = undefined;
   // Renderer callback with condition
@@ -73,14 +75,13 @@ const TimerCard = (props: Props) => {
 
   const startTimer = () => {
     const timeDate = dayjs()
-      .set("hour", time.getHours())
-      .set("minute", time.getMinutes())
-      .set("second", time.getSeconds());
+      .set("hour", timer.hour)
+      .set("minute", timer.minute);
     setCountdownDate(timeDate.valueOf());
     setProgress({
       value: 0,
       startDate: Date.now(),
-      endDate: time.valueOf(),
+      endDate: timeDate.valueOf(),
     });
     countdownApi?.start();
     setRunning(true);
@@ -111,8 +112,8 @@ const TimerCard = (props: Props) => {
    * Notification APIで通知する
    */
   const timerAlert = () => {
-    const n = new Notification(`${title} alert!`, {
-      tag: title + Date.now().toString(),
+    const n = new Notification(`${timer.title} alert!`, {
+      tag: timer.title + Date.now().toString(),
     });
     n.onclick = () => {
       n.close();
@@ -122,15 +123,11 @@ const TimerCard = (props: Props) => {
     console.log("onChangeTitleEditMode");
     if (isTitleEditMode) {
       setTitleEditMode((flg) => !flg);
-      setTitle(tmpTitle.current);
+      dispatch(updateTitle({ id: props.id, title: tmpTitle.current }));
     } else {
       setTitleEditMode((flg) => !flg);
-      tmpTitle.current = title;
+      tmpTitle.current = timer.title;
     }
-    console.log({
-      title,
-      tmp: tmpTitle.current,
-    });
   };
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
@@ -171,7 +168,7 @@ const TimerCard = (props: Props) => {
                 <TextField
                   id="title "
                   label="title"
-                  defaultValue={title}
+                  defaultValue={timer.title}
                   inputRef={tmpTitle}
                   onChange={(v) => {
                     tmpTitle.current = v.target.value;
@@ -196,7 +193,7 @@ const TimerCard = (props: Props) => {
                   }}
                   style={isTitleEditMode ? { display: "none" } : {}}
                 >
-                  {title}
+                  {timer.title}
                 </Typography>
                 <IconButton
                   aria-label="edit-title"
@@ -235,11 +232,15 @@ const TimerCard = (props: Props) => {
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <TimePicker
                   ampm={false}
-                  value={time}
+                  value={dayjs()
+                    .set("h", timer.hour)
+                    .set("minute", timer.minute)}
                   onChange={(newValue) => {
                     if (newValue) {
-                      setTime(newValue);
                       setCanStartTimer(dayjs().isBefore(newValue));
+                      dispatch(
+                        updateTimer({ id: props.id, date: newValue.valueOf() })
+                      );
                     }
                   }}
                   readOnly={isRunning}
