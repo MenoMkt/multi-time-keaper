@@ -5,8 +5,15 @@ import { ulid } from "ulid";
 export type Timer = {
   id: string;
   title: string;
-  hour: number;
-  minute: number;
+  inputMode: "date" | "remain";
+  date: {
+    hour: number;
+    minute: number;
+  };
+  remain: {
+    unit: "h" | "m" | "s";
+    time: number;
+  };
 };
 
 export type TimerState = {
@@ -34,8 +41,15 @@ export const timerSlice = createSlice({
       state.timers[id] = {
         id: id,
         title: `timer${number}`,
-        hour: date.get("h"),
-        minute: date.get("minute"),
+        inputMode: "date",
+        date: {
+          hour: date.get("h"),
+          minute: date.get("minute"),
+        },
+        remain: {
+          time: 0,
+          unit: "h",
+        },
       };
       state.length = Object.keys(state.timers).length;
     },
@@ -59,7 +73,7 @@ export const timerSlice = createSlice({
       console.log(action);
       state.timers[action.payload.id].title = action.payload.title;
     },
-    updateTimer: (
+    updateDate: (
       state,
       action: PayloadAction<{
         id: string;
@@ -68,8 +82,31 @@ export const timerSlice = createSlice({
     ) => {
       console.log(action);
       const date = action.payload.date;
-      state.timers[action.payload.id].hour = dayjs(date).get("h");
-      state.timers[action.payload.id].minute = dayjs(date).get("minute");
+      state.timers[action.payload.id].date.hour = dayjs(date).get("h");
+      state.timers[action.payload.id].date.minute = dayjs(date).get("minute");
+    },
+    updateTime: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        time: number;
+        unit: "h" | "m" | "s";
+      }>
+    ) => {
+      console.log(action);
+      state.timers[action.payload.id].remain = {
+        time: action.payload.time,
+        unit: action.payload.unit,
+      };
+    },
+    updateInputMode: (
+      state,
+      action: PayloadAction<{
+        id: string;
+        mode: "date" | "remain";
+      }>
+    ) => {
+      state.timers[action.payload.id].inputMode = action.payload.mode;
     },
   },
 });
@@ -79,9 +116,11 @@ export const {
   addNewTimer,
   addTimer,
   removeTimer,
-  updateTimer,
+  updateDate,
   updateTitle,
   initTimerList,
+  updateInputMode,
+  updateTime,
 } = timerSlice.actions;
 
 export default timerSlice.reducer;

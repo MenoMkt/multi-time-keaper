@@ -13,6 +13,10 @@ import {
   LinearProgress,
   Alert,
   Collapse,
+  Select,
+  MenuItem,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -28,7 +32,13 @@ import Countdown, {
 } from "react-countdown";
 
 import { useDispatch, useSelector } from "react-redux";
-import { Timer, updateTimer, updateTitle } from "../store/timer";
+import {
+  Timer,
+  updateDate,
+  updateTitle,
+  updateInputMode,
+  updateTime,
+} from "../store/timer";
 import { RootState } from "../store";
 
 type Props = {
@@ -61,6 +71,7 @@ const TimerCard = (props: Props) => {
   let countdownApi: CountdownApi | undefined = undefined;
   // Renderer callback with condition
   const countdownRender = ({
+    days,
     hours,
     minutes,
     seconds,
@@ -74,9 +85,10 @@ const TimerCard = (props: Props) => {
   };
 
   const startTimer = () => {
-    const timeDate = dayjs()
-      .set("hour", timer.hour)
-      .set("minute", timer.minute);
+    const timeDate =
+      timer.inputMode === "date"
+        ? dayjs().set("hour", timer.date.hour).set("minute", timer.date.minute)
+        : dayjs().add(timer.remain.time, timer.remain.unit);
     setCountdownDate(timeDate.valueOf());
     setProgress({
       value: 0,
@@ -219,6 +231,20 @@ const TimerCard = (props: Props) => {
                 <IconButton aria-label="reset" onClick={props.onDelete}>
                   <DeleteIcon />
                 </IconButton>
+                <FormControlLabel
+                  // 時間指定切り替え用トグル
+                  control={<Switch name="time-set-toggle" />}
+                  label="時間指定"
+                  checked={timer.inputMode === "remain"}
+                  onChange={(e, checked) => {
+                    dispatch(
+                      updateInputMode({
+                        id: timer.id,
+                        mode: checked ? "remain" : "date",
+                      })
+                    );
+                  }}
+                />
               </Box>
             </Box>
             {/* 右側の要素 */}
@@ -229,29 +255,85 @@ const TimerCard = (props: Props) => {
                 flexDirection: "column",
               }}
             >
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <TimePicker
-                  ampm={false}
-                  value={dayjs()
-                    .set("h", timer.hour)
-                    .set("minute", timer.minute)}
-                  onChange={(newValue) => {
-                    if (newValue) {
-                      setCanStartTimer(dayjs().isBefore(newValue));
-                      dispatch(
-                        updateTimer({ id: props.id, date: newValue.valueOf() })
-                      );
-                    }
-                  }}
-                  readOnly={isRunning}
-                  renderInput={(params) => <TextField {...params} />}
-                />
-                <Collapse in={!canStartTimer}>
-                  <Alert severity="warning">
-                    現在時刻より先の時間に設定してください。
-                  </Alert>
-                </Collapse>
-              </LocalizationProvider>
+              {timer.inputMode === "date" ? (
+                // 日時指定
+                <Box>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <TimePicker
+                      ampm={false}
+                      value={dayjs()
+                        .set("h", timer.date.hour)
+                        .set("minute", timer.date.minute)}
+                      onChange={(newValue) => {
+                        if (newValue) {
+                          setCanStartTimer(dayjs().isBefore(newValue));
+                          dispatch(
+                            updateDate({
+                              id: props.id,
+                              date: newValue.valueOf(),
+                            })
+                          );
+                        }
+                      }}
+                      readOnly={isRunning}
+                      renderInput={(params) => <TextField {...params} />}
+                    />
+                    <Collapse in={!canStartTimer}>
+                      <Alert severity="warning">
+                        現在時刻より先の時間に設定してください。
+                      </Alert>
+                    </Collapse>
+                  </LocalizationProvider>
+                </Box>
+              ) : (
+                // 時間指定
+                <Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "start",
+                      flexDirection: "row",
+                    }}
+                  >
+                    <TextField
+                      id="time-input"
+                      label="時間"
+                      inputProps={{
+                        readOnly: isRunning,
+                      }}
+                      value={timer.remain.time}
+                      onChange={(e) => {
+                        dispatch(
+                          updateTime({
+                            id: timer.id,
+                            time: Number(e.target.value),
+                            unit: timer.remain.unit,
+                          })
+                        );
+                      }}
+                    />
+                    <Select
+                      id="time-input-unit"
+                      value={timer.remain.unit}
+                      readOnly={isRunning}
+                      onChange={(val) => {
+                        dispatch(
+                          updateTime({
+                            id: timer.id,
+                            time: timer.remain.time,
+                            unit: val.target.value as "h" | "m" | "s",
+                          })
+                        );
+                      }}
+                    >
+                      <MenuItem value={"h"}>h</MenuItem>
+                      <MenuItem value={"m"}>m</MenuItem>
+                      <MenuItem value={"s"}>s</MenuItem>
+                    </Select>
+                  </Box>
+                </Box>
+              )}
+
               <Box sx={{ width: 1 }}>
                 <Countdown
                   date={countdownDate}
@@ -263,7 +345,8 @@ const TimerCard = (props: Props) => {
                   onTick={onCountdownTick}
                   overtime={true}
                   autoStart={false}
-                  zeroPadTime={3}
+                  zeroPadTime={2}
+                  daysInHours={true}
                 />
               </Box>
             </Box>
