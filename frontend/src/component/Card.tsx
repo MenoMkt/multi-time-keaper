@@ -30,7 +30,8 @@ import Countdown, {
   CountdownApi,
   zeroPad,
 } from "react-countdown";
-
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Timer,
@@ -151,6 +152,32 @@ const TimerCard = (props: Props) => {
     }
   };
 
+  const InputModeToggleButton = () => {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          direction: "colum",
+          alignItems: "center",
+        }}
+      >
+        <CalendarTodayIcon fontSize="small" />
+        <Switch
+          name="time-set-toggle"
+          checked={timer.inputMode === "remain"}
+          onChange={(e, checked) => {
+            dispatch(
+              updateInputMode({
+                id: timer.id,
+                mode: checked ? "remain" : "date",
+              })
+            );
+          }}
+        />
+        <AccessTimeIcon fontSize="small" />
+      </Box>
+    );
+  };
   return (
     <div className="TimerCard">
       <Card
@@ -231,20 +258,7 @@ const TimerCard = (props: Props) => {
                 <IconButton aria-label="reset" onClick={props.onDelete}>
                   <DeleteIcon />
                 </IconButton>
-                <FormControlLabel
-                  // 時間指定切り替え用トグル
-                  control={<Switch name="time-set-toggle" />}
-                  label="時間指定"
-                  checked={timer.inputMode === "remain"}
-                  onChange={(e, checked) => {
-                    dispatch(
-                      updateInputMode({
-                        id: timer.id,
-                        mode: checked ? "remain" : "date",
-                      })
-                    );
-                  }}
-                />
+                <InputModeToggleButton />
               </Box>
             </Box>
             {/* 右側の要素 */}

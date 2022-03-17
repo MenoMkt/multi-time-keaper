@@ -1,11 +1,13 @@
 import AppBar from "@mui/material/AppBar";
+import { Box, Grid } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import Tooltip from "@mui/material/Tooltip";
 import Switch from "@mui/material/Switch";
-import FormControlLabel from "@mui/material/FormControlLabel";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 
 import React from "react";
 import { ColorModeContext } from "../App";
@@ -25,10 +27,18 @@ const Header = (props: Props) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           MultiTimeKeeper
         </Typography>
-        <FormControlLabel
-          control={<Switch onChange={onChangeDarkMode} />}
-          label="ダークモード"
-        />
+        <Box
+          sx={{
+            display: "flex",
+            direction: "colum",
+            alignItems: "center",
+            mr: 2,
+          }}
+        >
+          <LightModeIcon sx={{}} fontSize="small" />
+          <Switch onChange={onChangeDarkMode} size="small" />
+          <DarkModeIcon fontSize="small" />
+        </Box>
         <Tooltip title="タイマーを追加する" placement="bottom">
           <IconButton
             size="medium"
