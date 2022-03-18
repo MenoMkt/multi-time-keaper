@@ -1,28 +1,18 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import TimePicker from "@mui/lab/TimePicker";
 import {
   Box,
   Card,
   CardContent,
   IconButton,
-  TextField,
   Typography,
   LinearProgress,
-  Alert,
-  Collapse,
-  Select,
-  MenuItem,
-  Switch,
-  FormControlLabel,
+  Grid,
 } from "@mui/material";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import EditIcon from "@mui/icons-material/Edit";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
 import Countdown, {
@@ -30,8 +20,6 @@ import Countdown, {
   CountdownApi,
   zeroPad,
 } from "react-countdown";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Timer,
@@ -39,8 +27,11 @@ import {
   updateTitle,
   updateInputMode,
   updateTime,
+  TimeConfig,
 } from "../store/timer";
 import { RootState } from "../store";
+import TimerForm from "./TimerForm";
+import TitleForm from "./TitleForm";
 
 type Props = {
   id: string;
@@ -54,8 +45,6 @@ type Progress = {
 };
 
 const TimerCard = (props: Props) => {
-  const tmpTitle = useRef("");
-  const [isTitleEditMode, setTitleEditMode] = useState(false);
   const [canStartTimer, setCanStartTimer] = useState(true);
   const [countdownDate, setCountdownDate] = useState(Date.now());
   const [isRunning, setRunning] = useState(false);
@@ -132,16 +121,6 @@ const TimerCard = (props: Props) => {
       n.close();
     };
   };
-  const onChangeTitleEditMode = () => {
-    console.log("onChangeTitleEditMode");
-    if (isTitleEditMode) {
-      setTitleEditMode((flg) => !flg);
-      dispatch(updateTitle({ id: props.id, title: tmpTitle.current }));
-    } else {
-      setTitleEditMode((flg) => !flg);
-      tmpTitle.current = timer.title;
-    }
-  };
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
     if (isRunning) {
@@ -152,32 +131,35 @@ const TimerCard = (props: Props) => {
     }
   };
 
-  const InputModeToggleButton = () => {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          direction: "colum",
-          alignItems: "center",
-        }}
-      >
-        <CalendarTodayIcon fontSize="small" />
-        <Switch
-          name="time-set-toggle"
-          checked={timer.inputMode === "remain"}
-          onChange={(e, checked) => {
-            dispatch(
-              updateInputMode({
-                id: timer.id,
-                mode: checked ? "remain" : "date",
-              })
-            );
-          }}
-        />
-        <AccessTimeIcon fontSize="small" />
-      </Box>
+  const onChangeTimerForm = (value: TimeConfig) => {
+    setCanStartTimer(
+      dayjs()
+        .set("h", value.date.hour)
+        .set("m", value.date.minute)
+        .isAfter(Date.now())
+    );
+    dispatch(
+      updateInputMode({
+        id: timer.id,
+        mode: value.inputMode,
+      })
+    );
+    dispatch(
+      updateDate({
+        id: timer.id,
+        hour: value.date.hour,
+        minute: value.date.minute,
+      })
+    );
+    dispatch(
+      updateTime({
+        id: timer.id,
+        time: value.remain.time,
+        unit: value.remain.unit,
+      })
     );
   };
+
   return (
     <div className="TimerCard">
       <Card
@@ -186,168 +168,43 @@ const TimerCard = (props: Props) => {
         }}
       >
         <CardContent>
-          <Box
-            sx={{
-              alignItems: "flex-start",
-              display: "flex",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
+          <Grid container spacing={0}>
+            <Grid item xs={6}>
+              <TitleForm
+                title={timer.title}
+                onChange={(title) => {
+                  dispatch(
+                    updateTitle({
+                      id: timer.id,
+                      title,
+                    })
+                  );
                 }}
-              >
-                <TextField
-                  id="title "
-                  label="title"
-                  defaultValue={timer.title}
-                  inputRef={tmpTitle}
-                  onChange={(v) => {
-                    tmpTitle.current = v.target.value;
-                  }}
-                  sx={{
-                    width: "200px",
-                  }}
-                  style={!isTitleEditMode ? { display: "none" } : {}}
-                />
-                <Typography
-                  component="div"
-                  variant="h5"
-                  textAlign={"left"}
-                  sx={{
-                    pl: 1,
-                    pt: 2,
-                    pb: 1,
-                    width: "200px",
-                    boxSizing: "border-box",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                  style={isTitleEditMode ? { display: "none" } : {}}
-                >
-                  {timer.title}
-                </Typography>
-                <IconButton
-                  aria-label="edit-title"
-                  onClick={onChangeTitleEditMode}
-                  sx={{
-                    mt: 1,
-                    mb: 1,
-                  }}
-                  disabled={isRunning}
-                >
-                  {isTitleEditMode ? <CheckCircleIcon /> : <EditIcon />}
-                </IconButton>
-              </Box>
-              {/* タイマーコントロール */}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TimerForm
+                isRunning={isRunning}
+                canStartTimer={canStartTimer}
+                config={timer}
+                onChange={onChangeTimerForm}
+              />
+            </Grid>
+            <Grid item xs={6}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <IconButton
                   aria-label="play/pause"
                   onClick={onChangeStartPauseButton}
-                  disabled={isTitleEditMode || !canStartTimer}
+                  disabled={!canStartTimer}
                 >
                   {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
                 </IconButton>
                 <IconButton aria-label="reset" onClick={props.onDelete}>
                   <DeleteIcon />
                 </IconButton>
-                <InputModeToggleButton />
               </Box>
-            </Box>
-            {/* 右側の要素 */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "baseline",
-                flexDirection: "column",
-              }}
-            >
-              {timer.inputMode === "date" ? (
-                // 日時指定
-                <Box>
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <TimePicker
-                      ampm={false}
-                      value={dayjs()
-                        .set("h", timer.date.hour)
-                        .set("minute", timer.date.minute)}
-                      onChange={(newValue) => {
-                        if (newValue) {
-                          setCanStartTimer(dayjs().isBefore(newValue));
-                          dispatch(
-                            updateDate({
-                              id: props.id,
-                              date: newValue.valueOf(),
-                            })
-                          );
-                        }
-                      }}
-                      readOnly={isRunning}
-                      renderInput={(params) => <TextField {...params} />}
-                    />
-                    <Collapse in={!canStartTimer}>
-                      <Alert severity="warning">
-                        現在時刻より先の時間に設定してください。
-                      </Alert>
-                    </Collapse>
-                  </LocalizationProvider>
-                </Box>
-              ) : (
-                // 時間指定
-                <Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "start",
-                      flexDirection: "row",
-                    }}
-                  >
-                    <TextField
-                      id="time-input"
-                      label="時間"
-                      inputProps={{
-                        readOnly: isRunning,
-                      }}
-                      value={timer.remain.time}
-                      onChange={(e) => {
-                        dispatch(
-                          updateTime({
-                            id: timer.id,
-                            time: Number(e.target.value),
-                            unit: timer.remain.unit,
-                          })
-                        );
-                      }}
-                    />
-                    <Select
-                      id="time-input-unit"
-                      value={timer.remain.unit}
-                      readOnly={isRunning}
-                      onChange={(val) => {
-                        dispatch(
-                          updateTime({
-                            id: timer.id,
-                            time: timer.remain.time,
-                            unit: val.target.value as "h" | "m" | "s",
-                          })
-                        );
-                      }}
-                    >
-                      <MenuItem value={"h"}>h</MenuItem>
-                      <MenuItem value={"m"}>m</MenuItem>
-                      <MenuItem value={"s"}>s</MenuItem>
-                    </Select>
-                  </Box>
-                </Box>
-              )}
-
+            </Grid>
+            <Grid item xs={6}>
               <Box sx={{ width: 1 }}>
                 <Countdown
                   date={countdownDate}
@@ -363,17 +220,19 @@ const TimerCard = (props: Props) => {
                   daysInHours={true}
                 />
               </Box>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              mt: 1,
-              ml: 1,
-              mr: 1,
-            }}
-          >
-            <LinearProgress variant="determinate" value={progress.value} />
-          </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  mt: 1,
+                  ml: 1,
+                  mr: 1,
+                }}
+              >
+                <LinearProgress variant="determinate" value={progress.value} />
+              </Box>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
     </div>
