@@ -16,7 +16,7 @@ import {
   Select,
   MenuItem,
   Switch,
-  FormControlLabel,
+  Grid,
 } from "@mui/material";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
@@ -157,13 +157,14 @@ const TimerCard = (props: Props) => {
       <Box
         sx={{
           display: "flex",
-          direction: "colum",
           alignItems: "center",
+          justifyContent: "flex-end",
         }}
       >
         <CalendarTodayIcon fontSize="small" />
         <Switch
           name="time-set-toggle"
+          disabled={isRunning}
           checked={timer.inputMode === "remain"}
           onChange={(e, checked) => {
             dispatch(
@@ -186,18 +187,8 @@ const TimerCard = (props: Props) => {
         }}
       >
         <CardContent>
-          <Box
-            sx={{
-              alignItems: "flex-start",
-              display: "flex",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
+          <Grid container spacing={0}>
+            <Grid item xs={6}>
               <Box
                 sx={{
                   display: "flex",
@@ -246,29 +237,9 @@ const TimerCard = (props: Props) => {
                   {isTitleEditMode ? <CheckCircleIcon /> : <EditIcon />}
                 </IconButton>
               </Box>
-              {/* タイマーコントロール */}
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <IconButton
-                  aria-label="play/pause"
-                  onClick={onChangeStartPauseButton}
-                  disabled={isTitleEditMode || !canStartTimer}
-                >
-                  {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
-                </IconButton>
-                <IconButton aria-label="reset" onClick={props.onDelete}>
-                  <DeleteIcon />
-                </IconButton>
-                <InputModeToggleButton />
-              </Box>
-            </Box>
-            {/* 右側の要素 */}
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "baseline",
-                flexDirection: "column",
-              }}
-            >
+            </Grid>
+            <Grid item xs={6}>
+              <InputModeToggleButton />
               {timer.inputMode === "date" ? (
                 // 日時指定
                 <Box>
@@ -347,7 +318,22 @@ const TimerCard = (props: Props) => {
                   </Box>
                 </Box>
               )}
-
+            </Grid>
+            <Grid item xs={6}>
+              <Box sx={{ display: "flex", alignItems: "center" }}>
+                <IconButton
+                  aria-label="play/pause"
+                  onClick={onChangeStartPauseButton}
+                  disabled={isTitleEditMode || !canStartTimer}
+                >
+                  {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+                </IconButton>
+                <IconButton aria-label="reset" onClick={props.onDelete}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Grid>
+            <Grid item xs={6}>
               <Box sx={{ width: 1 }}>
                 <Countdown
                   date={countdownDate}
@@ -363,17 +349,19 @@ const TimerCard = (props: Props) => {
                   daysInHours={true}
                 />
               </Box>
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              mt: 1,
-              ml: 1,
-              mr: 1,
-            }}
-          >
-            <LinearProgress variant="determinate" value={progress.value} />
-          </Box>
+            </Grid>
+            <Grid item xs={12}>
+              <Box
+                sx={{
+                  mt: 1,
+                  ml: 1,
+                  mr: 1,
+                }}
+              >
+                <LinearProgress variant="determinate" value={progress.value} />
+              </Box>
+            </Grid>
+          </Grid>
         </CardContent>
       </Card>
     </div>
