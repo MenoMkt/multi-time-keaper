@@ -5,6 +5,9 @@ import { ulid } from "ulid";
 export type Timer = {
   id: string;
   title: string;
+} & TimeConfig;
+
+export type TimeConfig = {
   inputMode: "date" | "remain";
   date: {
     hour: number;
@@ -15,7 +18,6 @@ export type Timer = {
     time: number;
   };
 };
-
 export type TimerState = {
   timers: Record<string, Timer>;
   length: number;
@@ -47,7 +49,7 @@ export const timerSlice = createSlice({
           minute: date.get("minute"),
         },
         remain: {
-          time: 0,
+          time: 1,
           unit: "h",
         },
       };
@@ -77,13 +79,13 @@ export const timerSlice = createSlice({
       state,
       action: PayloadAction<{
         id: string;
-        date: number;
+        hour: number;
+        minute: number;
       }>
     ) => {
       console.log(action);
-      const date = action.payload.date;
-      state.timers[action.payload.id].date.hour = dayjs(date).get("h");
-      state.timers[action.payload.id].date.minute = dayjs(date).get("minute");
+      state.timers[action.payload.id].date.hour = action.payload.hour;
+      state.timers[action.payload.id].date.minute = action.payload.minute;
     },
     updateTime: (
       state,

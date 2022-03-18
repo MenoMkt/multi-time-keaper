@@ -30,8 +30,6 @@ import Countdown, {
   CountdownApi,
   zeroPad,
 } from "react-countdown";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Timer,
@@ -39,8 +37,10 @@ import {
   updateTitle,
   updateInputMode,
   updateTime,
+  TimeConfig,
 } from "../store/timer";
 import { RootState } from "../store";
+import TimerForm from "./TimerForm";
 
 type Props = {
   id: string;
@@ -152,33 +152,35 @@ const TimerCard = (props: Props) => {
     }
   };
 
-  const InputModeToggleButton = () => {
-    return (
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "flex-end",
-        }}
-      >
-        <CalendarTodayIcon fontSize="small" />
-        <Switch
-          name="time-set-toggle"
-          disabled={isRunning}
-          checked={timer.inputMode === "remain"}
-          onChange={(e, checked) => {
-            dispatch(
-              updateInputMode({
-                id: timer.id,
-                mode: checked ? "remain" : "date",
-              })
-            );
-          }}
-        />
-        <AccessTimeIcon fontSize="small" />
-      </Box>
+  const onChangeTimerForm = (value: TimeConfig) => {
+    setCanStartTimer(
+      dayjs()
+        .set("h", value.date.hour)
+        .set("m", value.date.minute)
+        .isAfter(Date.now())
+    );
+    dispatch(
+      updateInputMode({
+        id: timer.id,
+        mode: value.inputMode,
+      })
+    );
+    dispatch(
+      updateDate({
+        id: timer.id,
+        hour: value.date.hour,
+        minute: value.date.minute,
+      })
+    );
+    dispatch(
+      updateTime({
+        id: timer.id,
+        time: value.remain.time,
+        unit: value.remain.unit,
+      })
     );
   };
+
   return (
     <div className="TimerCard">
       <Card
@@ -239,85 +241,12 @@ const TimerCard = (props: Props) => {
               </Box>
             </Grid>
             <Grid item xs={6}>
-              <InputModeToggleButton />
-              {timer.inputMode === "date" ? (
-                // 日時指定
-                <Box>
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <TimePicker
-                      ampm={false}
-                      value={dayjs()
-                        .set("h", timer.date.hour)
-                        .set("minute", timer.date.minute)}
-                      onChange={(newValue) => {
-                        if (newValue) {
-                          setCanStartTimer(dayjs().isBefore(newValue));
-                          dispatch(
-                            updateDate({
-                              id: props.id,
-                              date: newValue.valueOf(),
-                            })
-                          );
-                        }
-                      }}
-                      readOnly={isRunning}
-                      renderInput={(params) => <TextField {...params} />}
-                    />
-                    <Collapse in={!canStartTimer}>
-                      <Alert severity="warning">
-                        現在時刻より先の時間に設定してください。
-                      </Alert>
-                    </Collapse>
-                  </LocalizationProvider>
-                </Box>
-              ) : (
-                // 時間指定
-                <Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "start",
-                      flexDirection: "row",
-                    }}
-                  >
-                    <TextField
-                      id="time-input"
-                      label="時間"
-                      inputProps={{
-                        readOnly: isRunning,
-                      }}
-                      value={timer.remain.time}
-                      onChange={(e) => {
-                        dispatch(
-                          updateTime({
-                            id: timer.id,
-                            time: Number(e.target.value),
-                            unit: timer.remain.unit,
-                          })
-                        );
-                      }}
-                    />
-                    <Select
-                      id="time-input-unit"
-                      value={timer.remain.unit}
-                      readOnly={isRunning}
-                      onChange={(val) => {
-                        dispatch(
-                          updateTime({
-                            id: timer.id,
-                            time: timer.remain.time,
-                            unit: val.target.value as "h" | "m" | "s",
-                          })
-                        );
-                      }}
-                    >
-                      <MenuItem value={"h"}>h</MenuItem>
-                      <MenuItem value={"m"}>m</MenuItem>
-                      <MenuItem value={"s"}>s</MenuItem>
-                    </Select>
-                  </Box>
-                </Box>
-              )}
+              <TimerForm
+                isRunning={isRunning}
+                canStartTimer={canStartTimer}
+                config={timer}
+                onChange={onChangeTimerForm}
+              />
             </Grid>
             <Grid item xs={6}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
