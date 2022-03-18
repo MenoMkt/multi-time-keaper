@@ -1,28 +1,18 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
-import AdapterDateFns from "@mui/lab/AdapterDateFns";
-import LocalizationProvider from "@mui/lab/LocalizationProvider";
-import TimePicker from "@mui/lab/TimePicker";
 import {
   Box,
   Card,
   CardContent,
   IconButton,
-  TextField,
   Typography,
   LinearProgress,
-  Alert,
-  Collapse,
-  Select,
-  MenuItem,
-  Switch,
   Grid,
 } from "@mui/material";
 
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
-import EditIcon from "@mui/icons-material/Edit";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
 import Countdown, {
@@ -41,6 +31,7 @@ import {
 } from "../store/timer";
 import { RootState } from "../store";
 import TimerForm from "./TimerForm";
+import TitleForm from "./TitleForm";
 
 type Props = {
   id: string;
@@ -54,8 +45,6 @@ type Progress = {
 };
 
 const TimerCard = (props: Props) => {
-  const tmpTitle = useRef("");
-  const [isTitleEditMode, setTitleEditMode] = useState(false);
   const [canStartTimer, setCanStartTimer] = useState(true);
   const [countdownDate, setCountdownDate] = useState(Date.now());
   const [isRunning, setRunning] = useState(false);
@@ -132,16 +121,6 @@ const TimerCard = (props: Props) => {
       n.close();
     };
   };
-  const onChangeTitleEditMode = () => {
-    console.log("onChangeTitleEditMode");
-    if (isTitleEditMode) {
-      setTitleEditMode((flg) => !flg);
-      dispatch(updateTitle({ id: props.id, title: tmpTitle.current }));
-    } else {
-      setTitleEditMode((flg) => !flg);
-      tmpTitle.current = timer.title;
-    }
-  };
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
     if (isRunning) {
@@ -191,54 +170,17 @@ const TimerCard = (props: Props) => {
         <CardContent>
           <Grid container spacing={0}>
             <Grid item xs={6}>
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
+              <TitleForm
+                title={timer.title}
+                onChange={(title) => {
+                  dispatch(
+                    updateTitle({
+                      id: timer.id,
+                      title,
+                    })
+                  );
                 }}
-              >
-                <TextField
-                  id="title "
-                  label="title"
-                  defaultValue={timer.title}
-                  inputRef={tmpTitle}
-                  onChange={(v) => {
-                    tmpTitle.current = v.target.value;
-                  }}
-                  sx={{
-                    width: "200px",
-                  }}
-                  style={!isTitleEditMode ? { display: "none" } : {}}
-                />
-                <Typography
-                  component="div"
-                  variant="h5"
-                  textAlign={"left"}
-                  sx={{
-                    pl: 1,
-                    pt: 2,
-                    pb: 1,
-                    width: "200px",
-                    boxSizing: "border-box",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                  }}
-                  style={isTitleEditMode ? { display: "none" } : {}}
-                >
-                  {timer.title}
-                </Typography>
-                <IconButton
-                  aria-label="edit-title"
-                  onClick={onChangeTitleEditMode}
-                  sx={{
-                    mt: 1,
-                    mb: 1,
-                  }}
-                  disabled={isRunning}
-                >
-                  {isTitleEditMode ? <CheckCircleIcon /> : <EditIcon />}
-                </IconButton>
-              </Box>
+              />
             </Grid>
             <Grid item xs={6}>
               <TimerForm
@@ -253,7 +195,7 @@ const TimerCard = (props: Props) => {
                 <IconButton
                   aria-label="play/pause"
                   onClick={onChangeStartPauseButton}
-                  disabled={isTitleEditMode || !canStartTimer}
+                  disabled={!canStartTimer}
                 >
                   {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
                 </IconButton>
