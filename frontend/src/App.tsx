@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./App.scss";
-import { Box, Container } from "@mui/material";
+import { Container, Grid } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import TimerCard from "./component/Card";
@@ -71,23 +71,20 @@ function App() {
         </ColorModeContext.Provider>
         <main>
           <Container fixed>
-            {Object.keys(timerState.timers).map((id) => {
-              return (
-                <Box
-                  key={id}
-                  sx={{
-                    mb: 2,
-                  }}
-                >
-                  <TimerCard
-                    title={timerState.timers[id].title}
-                    key={id}
-                    id={id}
-                    onDelete={() => dispatch(removeTimer(id))}
-                  ></TimerCard>
-                </Box>
-              );
-            })}
+            <Grid container spacing={2}>
+              {Object.keys(timerState.timers).map((id) => {
+                return (
+                  <Grid item sm={12} md={6} key={id}>
+                    <TimerCard
+                      title={timerState.timers[id].title}
+                      key={id}
+                      id={id}
+                      onDelete={() => dispatch(removeTimer(id))}
+                    ></TimerCard>
+                  </Grid>
+                );
+              })}
+            </Grid>
           </Container>
         </main>
         <footer></footer>

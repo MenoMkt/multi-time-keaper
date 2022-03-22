@@ -62,7 +62,12 @@ const TimerForm = (props: Props) => {
       <InputModeToggleButton />
       {timer.inputMode === "date" ? (
         // 日時指定
-        <Box>
+        <Box
+        //   sx={{
+        //     display: "flex",
+        //     justifyContent: "flex-end",
+        //   }}
+        >
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <TimePicker
               ampm={false}
@@ -83,11 +88,6 @@ const TimerForm = (props: Props) => {
               readOnly={props.isRunning}
               renderInput={(params) => <TextField {...params} />}
             />
-            <Collapse in={!props.canStartTimer}>
-              <Alert severity="warning">
-                現在時刻より先の時間に設定してください。
-              </Alert>
-            </Collapse>
           </LocalizationProvider>
         </Box>
       ) : (
@@ -138,6 +138,11 @@ const TimerForm = (props: Props) => {
           </Box>
         </Box>
       )}
+      <Collapse in={!props.canStartTimer}>
+        <Alert severity="warning">
+          現在時刻より先の時間に設定してください。
+        </Alert>
+      </Collapse>
     </Box>
   );
 };

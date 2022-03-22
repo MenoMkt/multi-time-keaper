@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -161,81 +161,75 @@ const TimerCard = (props: Props) => {
   };
 
   return (
-    <div className="TimerCard">
-      <Card
-        sx={{
-          width: "500px",
-        }}
-      >
-        <CardContent>
-          <Grid container spacing={0}>
-            <Grid item xs={6}>
-              <TitleForm
-                title={timer.title}
-                onChange={(title) => {
-                  dispatch(
-                    updateTitle({
-                      id: timer.id,
-                      title,
-                    })
-                  );
-                }}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TimerForm
-                isRunning={isRunning}
-                canStartTimer={canStartTimer}
-                config={timer}
-                onChange={onChangeTimerForm}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <IconButton
-                  aria-label="play/pause"
-                  onClick={onChangeStartPauseButton}
-                  disabled={!canStartTimer}
-                >
-                  {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
-                </IconButton>
-                <IconButton aria-label="reset" onClick={props.onDelete}>
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </Grid>
-            <Grid item xs={6}>
-              <Box sx={{ width: 1 }}>
-                <Countdown
-                  date={countdownDate}
-                  renderer={countdownRender}
-                  ref={(ref) => {
-                    countdownApi = ref?.getApi();
-                  }}
-                  onComplete={completeTimer}
-                  onTick={onCountdownTick}
-                  overtime={true}
-                  autoStart={false}
-                  zeroPadTime={2}
-                  daysInHours={true}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Box
-                sx={{
-                  mt: 1,
-                  ml: 1,
-                  mr: 1,
-                }}
-              >
-                <LinearProgress variant="determinate" value={progress.value} />
-              </Box>
-            </Grid>
+    <Card>
+      <CardContent>
+        <Grid container spacing={0}>
+          <Grid item xs={6}>
+            <TitleForm
+              title={timer.title}
+              onChange={(title) => {
+                dispatch(
+                  updateTitle({
+                    id: timer.id,
+                    title,
+                  })
+                );
+              }}
+            />
           </Grid>
-        </CardContent>
-      </Card>
-    </div>
+          <Grid item xs={6}>
+            <TimerForm
+              isRunning={isRunning}
+              canStartTimer={canStartTimer}
+              config={timer}
+              onChange={onChangeTimerForm}
+            />
+          </Grid>
+          <Grid item xs={6}>
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <IconButton
+                aria-label="play/pause"
+                onClick={onChangeStartPauseButton}
+                disabled={!canStartTimer}
+              >
+                {isRunning ? <PauseIcon /> : <PlayArrowIcon />}
+              </IconButton>
+              <IconButton aria-label="reset" onClick={props.onDelete}>
+                <DeleteIcon />
+              </IconButton>
+            </Box>
+          </Grid>
+          <Grid item xs={6}>
+            <Box sx={{ width: 1 }}>
+              <Countdown
+                date={countdownDate}
+                renderer={countdownRender}
+                ref={(ref) => {
+                  countdownApi = ref?.getApi();
+                }}
+                onComplete={completeTimer}
+                onTick={onCountdownTick}
+                overtime={true}
+                autoStart={false}
+                zeroPadTime={2}
+                daysInHours={true}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <Box
+              sx={{
+                mt: 1,
+                ml: 1,
+                mr: 1,
+              }}
+            >
+              <LinearProgress variant="determinate" value={progress.value} />
+            </Box>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
   );
 };
 
