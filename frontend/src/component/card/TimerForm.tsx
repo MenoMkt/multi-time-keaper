@@ -8,7 +8,7 @@ import {
   TextField,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { TimeConfig } from "../store/timer";
+import { TimeConfig } from "../../store/timer";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { LocalizationProvider, TimePicker } from "@mui/lab";

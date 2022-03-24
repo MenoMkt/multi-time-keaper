@@ -28,8 +28,8 @@ import {
   updateInputMode,
   updateTime,
   TimeConfig,
-} from "../store/timer";
-import { RootState } from "../store";
+} from "../../store/timer";
+import { RootState } from "../../store";
 import TimerForm from "./TimerForm";
 import TitleForm from "./TitleForm";
 
