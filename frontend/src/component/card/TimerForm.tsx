@@ -43,7 +43,7 @@ const TimerForm = (props: Props) => {
       >
         <CalendarTodayIcon fontSize="small" />
         <Switch
-          name="time-set-toggle"
+          aria-label="time-set-toggle"
           disabled={props.isRunning}
           checked={timer.inputMode === "remain"}
           onChange={(e, checked) => {
@@ -102,7 +102,7 @@ const TimerForm = (props: Props) => {
           >
             <TextField
               id="time-input"
-              label="時間"
+              label="time-input"
               inputProps={{
                 readOnly: props.isRunning,
               }}

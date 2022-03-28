@@ -33,9 +33,8 @@ import { RootState } from "../../store";
 import TimerForm from "./TimerForm";
 import TitleForm from "./TitleForm";
 
-type Props = {
+export type Props = {
   id: string;
-  title: string;
   onDelete?: () => void;
 };
 type Progress = {
