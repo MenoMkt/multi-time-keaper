@@ -2,6 +2,8 @@ import {
   Alert,
   Box,
   Collapse,
+  FormControl,
+  FormControlLabel,
   MenuItem,
   Select,
   Switch,
@@ -14,6 +16,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { LocalizationProvider, TimePicker } from "@mui/lab";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import dayjs from "dayjs";
+import { Label } from "@mui/icons-material";
 
 type Props = {
   isRunning: boolean;
@@ -43,7 +46,8 @@ const TimerForm = (props: Props) => {
       >
         <CalendarTodayIcon fontSize="small" />
         <Switch
-          aria-label="time-set-toggle"
+          inputProps={{ "aria-label": "time-set-toggle", role: "switch" }}
+          // aria-label="time-set-toggle"
           disabled={props.isRunning}
           checked={timer.inputMode === "remain"}
           onChange={(e, checked) => {
@@ -70,6 +74,7 @@ const TimerForm = (props: Props) => {
         >
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <TimePicker
+              aria-label="time-picker"
               ampm={false}
               value={dayjs()
                 .set("h", timer.date.hour)
@@ -102,7 +107,7 @@ const TimerForm = (props: Props) => {
           >
             <TextField
               id="time-input"
-              label="time-input"
+              aria-label="time-input"
               inputProps={{
                 readOnly: props.isRunning,
               }}

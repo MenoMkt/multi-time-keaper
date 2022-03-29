@@ -34,8 +34,8 @@ function TitleForm(props: Props) {
       }}
     >
       <TextField
-        id="title "
-        label="title"
+        id="input-title"
+        aria-label="input-title"
         defaultValue={props.title}
         inputRef={tmpTitle}
         onChange={(v) => {
@@ -47,6 +47,7 @@ function TitleForm(props: Props) {
         style={!isTitleEditMode ? { display: "none" } : {}}
       />
       <Typography
+        aria-label="title"
         component="div"
         variant="h5"
         textAlign={"left"}
