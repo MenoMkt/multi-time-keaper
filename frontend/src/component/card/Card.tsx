@@ -43,6 +43,18 @@ type Progress = {
   endDate: number;
 };
 
+/**
+ * Notification APIで通知する
+ */
+export const timerAlert = (title: string) => {
+  const n = new Notification(`${title} alert!`, {
+    tag: title + Date.now().toString(),
+  });
+  n.onclick = () => {
+    n.close();
+  };
+};
+
 const TimerCard = (props: Props) => {
   const [canStartTimer, setCanStartTimer] = useState(true);
   const [countdownDate, setCountdownDate] = useState(Date.now());
@@ -95,7 +107,7 @@ const TimerCard = (props: Props) => {
   };
   const completeTimer = () => {
     console.log("on complete timer");
-    timerAlert();
+    timerAlert(timer.title);
     setRunning(false);
     countdownApi?.stop();
     // TODO:タイマー終了時に残り時間を00:00:00にしたいが、カウントダウンの日時を設定すると再度アラートが発火する
@@ -109,17 +121,7 @@ const TimerCard = (props: Props) => {
         (state.endDate - state.startDate),
     }));
   };
-  /**
-   * Notification APIで通知する
-   */
-  const timerAlert = () => {
-    const n = new Notification(`${timer.title} alert!`, {
-      tag: timer.title + Date.now().toString(),
-    });
-    n.onclick = () => {
-      n.close();
-    };
-  };
+
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
     if (isRunning) {

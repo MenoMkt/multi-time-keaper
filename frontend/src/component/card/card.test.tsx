@@ -3,8 +3,10 @@ import {
   fireEvent,
   screen,
   within,
+  waitFor,
 } from "@testing-library/react";
 import Card, { Props } from "./Card";
+import * as TimerCard from "./Card";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import timerReducer, { TimerState } from "../../store/timer";
@@ -162,4 +164,39 @@ test("スタートを押したらタイトル編集ボタンと時間設定部�
   expect(screen.getByLabelText("edit-title")).not.toBeDisabled();
   expect(screen.getByLabelText("time-set-toggle")).not.toBeDisabled();
 });
-test.todo("スタートし、指定した時間になったらアラートが表示される");
+test.skip("スタートし、指定した時間になったらアラートが表示される", async () => {
+  const spyAlert = jest.spyOn(TimerCard, "timerAlert").mockReturnValue();
+  //   jest.useFakeTimers();
+  const mockProps: Props = {
+    id: "hoge",
+    onDelete: jest.fn(),
+  };
+  render(<Card {...mockProps} />, {
+    length: 1,
+    timers: {
+      hoge: {
+        id: "hoge",
+        date: {
+          hour: 10,
+          minute: 10,
+        },
+        inputMode: "remain",
+        remain: {
+          time: 1,
+          unit: "s",
+        },
+        title: "title_hoge",
+      },
+    },
+  });
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: /play/i,
+    })
+  );
+  // FIXME: タイマー完了後のアラート処理のチェック
+  //   jest.runAllTimers();
+  await waitFor(() => expect(spyAlert).toBeCalled(), {
+    timeout: 2000,
+  });
+});
