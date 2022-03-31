@@ -24,6 +24,7 @@ export const useBackupApp = () => {
     );
   };
   useEffect(() => {
+    console.log("useBackupApp Effect");
     if (window) {
       window.addEventListener("visibilitychange", (event) => {
         if ((event.target as Document).visibilityState === "hidden") {
@@ -36,5 +37,5 @@ export const useBackupApp = () => {
         window.removeEventListener("beforeunload", handler);
       };
     }
-  });
+  }, []);
 };
