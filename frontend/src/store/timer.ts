@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import dayjs from "dayjs";
 import { ulid } from "ulid";
+import { getAppContext } from "../feature/appStorage";
 
 export type Timer = {
   id: string;
@@ -112,6 +113,18 @@ export const timerSlice = createSlice({
     },
   },
 });
+
+export const getBackupTimer = (): TimerState => {
+  const backup = getAppContext();
+  if (backup && backup.timer) {
+    return backup.timer;
+  } else {
+    return {
+      length: 0,
+      timers: {},
+    };
+  }
+};
 
 // Action creators are generated for each case reducer function
 export const {

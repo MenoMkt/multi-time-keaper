@@ -55,10 +55,7 @@ function App() {
     }
 
     // タイマーリストが0の場合初期化
-    const appContext = getAppContext();
-    if (appContext && appContext.timer && appContext.timer.length) {
-      dispatch(initTimerList(appContext.timer));
-    } else {
+    if (timerState.length === 0) {
       dispatch(addNewTimer());
     }
   }, []);

@@ -1,9 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import timerReducer from "./store/timer";
+import timerReducer, { getBackupTimer, TimerState } from "./store/timer";
 
 export const store = configureStore({
   reducer: {
     timer: timerReducer,
+  },
+  preloadedState: {
+    timer: getBackupTimer(),
   },
 });
 
