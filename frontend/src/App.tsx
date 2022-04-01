@@ -3,8 +3,8 @@ import "./App.scss";
 import { Container, Grid } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import TimerCard from "./component/Card";
-import Header from "./component/Header";
+import TimerCard from "./component/card/Card";
+import Header from "./component/header/Header";
 import { getAppContext, useBackupApp } from "./feature/appStorage";
 import { useSelector, useDispatch } from "react-redux";
 import { addNewTimer, removeTimer, initTimerList } from "./store/timer";
@@ -55,10 +55,7 @@ function App() {
     }
 
     // タイマーリストが0の場合初期化
-    const appContext = getAppContext();
-    if (appContext && appContext.timer && appContext.timer.length) {
-      dispatch(initTimerList(appContext.timer));
-    } else {
+    if (timerState.length === 0) {
       dispatch(addNewTimer());
     }
   }, []);

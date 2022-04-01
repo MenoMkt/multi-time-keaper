@@ -10,7 +10,7 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 
 import React from "react";
-import { ColorModeContext } from "../App";
+import { ColorModeContext } from "../../App";
 
 type Props = {
   onAddTimer?: () => void;

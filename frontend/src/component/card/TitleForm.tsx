@@ -10,20 +10,20 @@ type Props = {
 };
 
 function TitleForm(props: Props) {
-  const tmpTitle = useRef("");
+  const titleRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState(props.title);
+  const [tmpTitle, setTmpTitle] = useState(props.title);
   const [isTitleEditMode, setTitleEditMode] = useState(false);
   const onChangeTitleEditMode = () => {
     console.log("onChangeTitleEditMode");
     if (isTitleEditMode) {
       setTitleEditMode((flg) => !flg);
-      setTitle(tmpTitle.current);
+      setTitle(tmpTitle);
       if (props.onChange) {
-        props.onChange(tmpTitle.current);
+        props.onChange(tmpTitle);
       }
     } else {
       setTitleEditMode((flg) => !flg);
-      tmpTitle.current = title;
     }
   };
   return (
@@ -34,12 +34,18 @@ function TitleForm(props: Props) {
       }}
     >
       <TextField
-        id="title "
-        label="title"
-        defaultValue={props.title}
-        inputRef={tmpTitle}
+        id="input-title"
+        aria-label="input-title"
+        autoFocus
+        inputRef={titleRef}
+        onKeyPress={(v) => {
+          if (v.key === "Enter") {
+            onChangeTitleEditMode();
+          }
+        }}
+        value={tmpTitle}
         onChange={(v) => {
-          tmpTitle.current = v.target.value;
+          setTmpTitle(v.target.value);
         }}
         sx={{
           width: "200px",
@@ -47,6 +53,7 @@ function TitleForm(props: Props) {
         style={!isTitleEditMode ? { display: "none" } : {}}
       />
       <Typography
+        aria-label="title"
         component="div"
         variant="h5"
         textAlign={"left"}

@@ -28,20 +28,31 @@ import {
   updateInputMode,
   updateTime,
   TimeConfig,
-} from "../store/timer";
-import { RootState } from "../store";
+} from "../../store/timer";
+import { RootState } from "../../store";
 import TimerForm from "./TimerForm";
 import TitleForm from "./TitleForm";
 
-type Props = {
+export type Props = {
   id: string;
-  title: string;
   onDelete?: () => void;
 };
 type Progress = {
   value: number;
   startDate: number;
   endDate: number;
+};
+
+/**
+ * Notification APIで通知する
+ */
+export const timerAlert = (title: string) => {
+  const n = new Notification(`${title} alert!`, {
+    tag: title + Date.now().toString(),
+  });
+  n.onclick = () => {
+    n.close();
+  };
 };
 
 const TimerCard = (props: Props) => {
@@ -96,7 +107,7 @@ const TimerCard = (props: Props) => {
   };
   const completeTimer = () => {
     console.log("on complete timer");
-    timerAlert();
+    timerAlert(timer.title);
     setRunning(false);
     countdownApi?.stop();
     // TODO:タイマー終了時に残り時間を00:00:00にしたいが、カウントダウンの日時を設定すると再度アラートが発火する
@@ -110,17 +121,7 @@ const TimerCard = (props: Props) => {
         (state.endDate - state.startDate),
     }));
   };
-  /**
-   * Notification APIで通知する
-   */
-  const timerAlert = () => {
-    const n = new Notification(`${timer.title} alert!`, {
-      tag: timer.title + Date.now().toString(),
-    });
-    n.onclick = () => {
-      n.close();
-    };
-  };
+
   const onChangeStartPauseButton = () => {
     console.log("onChangeStartPauseButton");
     if (isRunning) {
