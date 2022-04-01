@@ -16,6 +16,7 @@ export const useBackupApp = () => {
   const timerState = useSelector((state: RootState) => state.timer);
 
   useEffect(() => {
+    console.log("backup");
     localStorage.setItem(
       LOCAL_STORAGE_CONTEXT_KEY,
       JSON.stringify({
