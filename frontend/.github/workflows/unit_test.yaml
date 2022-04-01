@@ -1,0 +1,11 @@
+name: test
+on: [push]
+jobs:
+  react-unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          ls -al
+          cd .github/workflows/
+          ls -al
