@@ -10,4 +10,6 @@ jobs:
         with:
           node-version: "14"
       - run: npm ci
+        working-directory: ./frontend
       - run: CI=true npm test
+        working-directory: ./frontend
