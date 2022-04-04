@@ -156,13 +156,13 @@ test("スタートを押したらタイトル編集ボタンと時間設定部�
       name: /play/i,
     })
   );
-  await waitFor(() => {
-    expect(
-      screen.getByRole("button", {
-        name: /play/i,
-      })
-    ).toBeDisabled();
-  });
+  // await waitFor(() => {
+  //   expect(
+  //     screen.getByRole("button", {
+  //       name: /play/i,
+  //     })
+  //   ).toBeDisabled();
+  // });
 
   expect(screen.getByLabelText("edit-title")).not.toBeDisabled();
   expect(screen.getByLabelText("time-set-toggle")).not.toBeDisabled();
