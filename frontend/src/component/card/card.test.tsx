@@ -128,7 +128,7 @@ test("編集時にタイトル編集ボタンを押したらストアのタイ�
   //   screen.debug();
   expect(screen.getByLabelText("title")).toHaveTextContent("title_hogetitle2");
 });
-test("スタートを押したらタイトル編集ボタンと時間設定部分が非活性化する", () => {
+test("スタートを押したらタイトル編集ボタンと時間設定部分が非活性化する", async () => {
   const mockProps: Props = {
     id: "hoge",
     onDelete: jest.fn(),
@@ -156,11 +156,14 @@ test("スタートを押したらタイトル編集ボタンと時間設定部�
       name: /play/i,
     })
   );
-  expect(
-    screen.getByRole("button", {
-      name: /play/i,
-    })
-  ).toBeDisabled();
+  await waitFor(() => {
+    expect(
+      screen.getByRole("button", {
+        name: /play/i,
+      })
+    ).toBeDisabled();
+  });
+
   expect(screen.getByLabelText("edit-title")).not.toBeDisabled();
   expect(screen.getByLabelText("time-set-toggle")).not.toBeDisabled();
 });
