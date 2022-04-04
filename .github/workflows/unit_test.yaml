@@ -5,7 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          ls -al
-          cd .github/workflows/
-          ls -al
+      - name: Setup NodeJs
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+      - run: npm ci
+      - run: CI=true npm test
