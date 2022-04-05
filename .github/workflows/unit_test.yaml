@@ -1,0 +1,15 @@
+name: test
+on: [push]
+jobs:
+  react-unit-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup NodeJs
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+      - run: npm ci
+        working-directory: ./frontend
+      - run: CI=true npm test
+        working-directory: ./frontend
