@@ -134,10 +134,12 @@ const TimerCard = (props: Props) => {
 
   const onChangeTimerForm = (value: TimeConfig) => {
     setCanStartTimer(
-      dayjs()
-        .set("h", value.date.hour)
-        .set("m", value.date.minute)
-        .isAfter(Date.now())
+      value.inputMode === "date"
+        ? dayjs()
+            .set("h", value.date.hour)
+            .set("m", value.date.minute)
+            .isAfter(Date.now())
+        : true
     );
     dispatch(
       updateInputMode({
